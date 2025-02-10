@@ -7,7 +7,6 @@ import axios from "axios";
 import eventBus from "@//utils/eventBus";
 import useAuth from "./useAuth";
 import { useReports } from "./useReports";
-import { JwtPayload } from "jwt-decode";
 
 export interface tokenDecoded {
   exp: number;
@@ -19,6 +18,7 @@ export interface tokenDecoded {
 const useSyncReports = () => {
   const { setDec } = useAuth();
   const { reports } = useReports();
+  const [report, setReport] = useState<Report | null>(null);
   const clearAllStorage = async () => {
     try {
       await AsyncStorage.clear();
@@ -158,7 +158,7 @@ const useSyncReports = () => {
       console.log("formData:", formData);
       // Envia os dados para o Xano
       const response = await axios.post(
-        `${process.env.EXPO_BASE_URL}/report`,
+        `${process.env.EXPO_PUBLIC_API_URL}/report`,
         formData,
         {
           headers: {
@@ -168,9 +168,17 @@ const useSyncReports = () => {
           },
         }
       );
-      console.log(response.data);
-
+      console.log(JSON.stringify(response.data, null, 2));
       console.log("Report salvo [DATABASE]");
+      // report.id = response.data.id;
+
+      // const reports = await getReports();
+
+      // const updateReports = reports.map((r: Report) =>
+      //   r.id === report.id ? { ...r, ...report } : r
+      // );
+
+      // await setReports(updateReports);
       return true;
     } catch (error: any) {
       {
@@ -183,8 +191,7 @@ const useSyncReports = () => {
     }
   };
   const submitReport = async (report: Report) => {
-    const netInfo = await NetInfo.fetch();
-    if (netInfo.isConnected) {
+    if ((await NetInfo.fetch()).isConnected) {
       // tentar enviar pro banco.
       if (await submit(report)) {
         report.submit = true;
@@ -234,6 +241,7 @@ const useSyncReports = () => {
     updateReport,
     clearAllStorage,
     removeReport,
+    setReport,
   };
 };
 

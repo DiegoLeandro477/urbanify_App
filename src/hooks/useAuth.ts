@@ -31,32 +31,31 @@ export default function useAuth() {
       return;
     }
     setLoading(true);
+    console.log("Login: ", { email, password });
     try {
       // 🔹 Substitua pela sua API de autenticação
       const response = await axios.post(
-        `${process.env.EXPO_BASE_URL}/user/login`,
+        `${process.env.EXPO_PUBLIC_API_URL}/user/login`,
         {
           email,
           password,
         }
       );
-
       const { token } = response.data;
       setDec(token);
-      // 🔹 Salva o token no AsyncStorage
+      // 🔹 Salva o token no SecureStore
       await SecureStore.setItemAsync("authToken", token);
       setIsAuthenticated(true); // Marca como autenticado após o login
 
       console.log("Login bem-sucedido!");
       setErrorEmailOrPassword(false);
       setTimeout(() => {
-        setLoading(false);
         router.replace("/home"); // replace evita que o usuário volte para a tela de login
       }, 1000);
-    } catch (error) {
-      console.error("Erro no login:", error);
-      setErrorEmailOrPassword(true);
+    } catch (err) {
+      console.error("[LOGIN]:", err);
       setLoading(false);
+      setErrorEmailOrPassword(true);
     }
   };
 

@@ -21,11 +21,11 @@ import { useReports } from "@//hooks/useReports";
 import styles from "./styles";
 import useCapture from "@//hooks/useCapture";
 import { router, UnknownInputParams } from "expo-router";
-import { useProtectedRoute } from "../middlewares/middleware";
+import useProtectedRoute from "../middlewares/middleware";
 
 const Home = () => {
   useProtectedRoute(); // Proteção de rotas
-  const { submitReport, saveReport, updateReport, clearStorage } =
+  const { submitReport, saveReport, updateReport, clearAllStorage } =
     useSyncReports();
   const { photo, handleCapture, setPhoto } = useCapture(); // Controle da Câmera
   const { reports, loadReports } = useReports(); // Pega a lista de reports monitorada
@@ -129,7 +129,6 @@ const Home = () => {
       return;
     }
   };
-
   // Renderiza um item da lista de reports
   const renderReport = ({ item }: { item: Report }) => (
     <TouchableOpacity
