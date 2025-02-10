@@ -7,6 +7,8 @@ import axios from "axios";
 import eventBus from "@//utils/eventBus";
 import useAuth from "./useAuth";
 import { useReports } from "./useReports";
+import useCapture from "./useCapture";
+import * as Location from "expo-location";
 
 export interface tokenDecoded {
   exp: number;
@@ -58,6 +60,63 @@ const useSyncReports = () => {
     } catch (error) {
       console.log("[SET-REPORTS] : ", error);
     }
+  };
+
+  const createReport = async (severity: string, photo: string) => {
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    });
+    // Cria um novo relatório com a foto capturada
+    const newReport: Report = {
+      id: Math.round(
+        Date.now() / Math.floor(Math.random() * (1000 + 1))
+      ).toString(), // Gera um novo ID
+      coodenates: null, // Placeholder para localização
+      subregion: null,
+      street: null,
+      district: null,
+      severity: severity,
+      submit: false,
+      image: photo!,
+      date: formattedDate,
+    };
+
+    saveReport(newReport);
+    // Inicia o carregamento da localização
+    let attempts = 0;
+    // Tentar até 5 vezes
+    while (attempts < 5) {
+      try {
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        const address = await Location.reverseGeocodeAsync({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        });
+
+        // Atualiza o relatório com a nova localização
+        newReport.street = `${address[0].street || "Undefined"}`;
+        newReport.district = `${address[0].district || "Undefined"}`;
+        newReport.subregion = `${address[0].subregion || "Undefined"}`;
+        newReport.coodenates = {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        };
+
+        break;
+      } catch (error) {
+        console.warn("Tentando obter localização");
+
+        // Se a primeira tentativa falhar, aguarda 5 segundos e tenta novamente
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Atraso de 5 segundos
+      }
+
+      attempts++;
+    }
+    await updateReport(newReport);
+    submitReport(newReport);
   };
 
   const removeReport = async (report: Report) => {
@@ -112,6 +171,7 @@ const useSyncReports = () => {
   };
   const submit = async (report: Report) => {
     try {
+      console.log("Tentando enviar report..");
       const formData = new FormData();
       const token = await SecureStore.getItemAsync("authToken");
       if (!token) return;
@@ -121,9 +181,10 @@ const useSyncReports = () => {
       const data = {
         user_id: decode.id.S,
         coordinates: {
-          latitude: report.location?.latitude,
-          longitude: report.location?.longitude,
+          latitude: report.coodenates?.latitude,
+          longitude: report.coodenates?.longitude,
         },
+        subregion: report.subregion,
         district: report.district,
         street: report.street,
         severity: report.severity,
@@ -242,6 +303,8 @@ const useSyncReports = () => {
     clearAllStorage,
     removeReport,
     setReport,
+    sendPendingReports,
+    createReport,
   };
 };
 

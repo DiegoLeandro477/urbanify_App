@@ -1,10 +1,11 @@
 export interface Report {
   id: string;
-  image?: string;
-  submit: boolean;
-  location: { latitude: number; longitude: number } | null;
-  district: string;
-  street: string;
+  image: string;
   severity: string;
+  coodenates: { latitude: number; longitude: number } | null;
+  subregion: string | null;
+  district: string | null;
+  street: string | null;
   date: string;
+  submit: boolean;
 }

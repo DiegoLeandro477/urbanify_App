@@ -10,7 +10,7 @@ export const useReports = () => {
   const loadReports = async () => {
     try {
       const storedReportsOffline = await AsyncStorage.getItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS
+        process.env.EXPO_PUBLIC_STORAGE_REPORTS!
       );
 
       const reports = storedReportsOffline
