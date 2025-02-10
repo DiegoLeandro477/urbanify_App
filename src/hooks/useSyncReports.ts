@@ -19,7 +19,7 @@ export interface tokenDecoded {
 const useSyncReports = () => {
   const { setDec } = useAuth();
   const { reports } = useReports();
-  const clearStorage = async () => {
+  const clearAllStorage = async () => {
     try {
       await AsyncStorage.clear();
       await SecureStore.deleteItemAsync("authToken");
@@ -29,24 +29,46 @@ const useSyncReports = () => {
     }
   };
 
+  const getReports = async () => {
+    let storedReports = null;
+    try {
+      if (process.env.EXPO_PUBLIC_STORAGE_REPORTS) {
+        storedReports = await AsyncStorage.getItem(
+          process.env.EXPO_PUBLIC_STORAGE_REPORTS
+        );
+      } else {
+        throw "Local Storage não encontrado!";
+      }
+      storedReports = storedReports ? JSON.parse(storedReports) : [];
+    } catch (error) {
+      console.error("[GET-REPORTS] : ", error);
+    } finally {
+      return storedReports;
+    }
+  };
+
+  const setReports = async (reports: Report[]) => {
+    try {
+      if (!process.env.EXPO_PUBLIC_STORAGE_REPORTS)
+        throw "Não foi possível encontrar o storage";
+      await AsyncStorage.setItem(
+        process.env.EXPO_PUBLIC_STORAGE_REPORTS,
+        JSON.stringify(reports)
+      );
+    } catch (error) {
+      console.log("[SET-REPORTS] : ", error);
+    }
+  };
+
   const removeReport = async (report: Report) => {
     try {
-      // Busca os reports armazenados no localStorage especificado
-      const storedReports = await AsyncStorage.getItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS
-      );
-      const reports = storedReports ? JSON.parse(storedReports) : [];
-
+      const reports = await getReports();
       // Filtra removendo o report com o ID correspondente
       const updatedReports = reports.filter((r: Report) => r.id !== report.id);
 
       if (updateReport.length !== reports.length) {
         console.log("Report removido [OFF_REPORTS]");
-        // Salva a lista atualizada no AsyncStorage
-        await AsyncStorage.setItem(
-          process.env.EXPO_PUBLIC_STORAGE_REPORTS,
-          JSON.stringify(updatedReports)
-        );
+        await setReports(reports);
         eventBus.emit("updateStorageReports");
       } else {
         console.log("Report nao encontrado [OFF_REPORTS]");
@@ -58,23 +80,15 @@ const useSyncReports = () => {
 
   const updateReport = async (updatedReport: Report) => {
     try {
-      // Busca os reports armazenados
-      const storedReports = await AsyncStorage.getItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS
-      );
-      const reports = storedReports ? JSON.parse(storedReports) : [];
+      const reports = await getReports();
 
-      const updatedReports = reports.map((report: Report) =>
+      const updateReports = reports.map((report: Report) =>
         report.id === updatedReport.id
           ? { ...report, ...updatedReport }
           : report
       );
 
-      // Salvar a lista de reports novamente no AsyncStorage
-      await AsyncStorage.setItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS,
-        JSON.stringify(updatedReports)
-      );
+      await setReports(updateReports);
       console.info("Report atualizado [STORAGE]");
       eventBus.emit("updateStorageReports");
     } catch (error) {
@@ -84,21 +98,12 @@ const useSyncReports = () => {
 
   const saveReport = async (report: Report) => {
     try {
-      // Busca os reports armazenados
-      const storedReports = await AsyncStorage.getItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS
-      );
-      let reports = storedReports ? JSON.parse(storedReports) : [];
+      let reports = await getReports();
 
       if (!reports) return;
-
       reports.unshift(report);
 
-      // Salva no AsyncStorage
-      await AsyncStorage.setItem(
-        process.env.EXPO_PUBLIC_STORAGE_REPORTS,
-        JSON.stringify(reports)
-      );
+      await setReports(reports);
       console.log("Report salvo [STORAGE].");
       eventBus.emit("updateStorageReports");
     } catch (error) {
@@ -223,7 +228,13 @@ const useSyncReports = () => {
     }
   }, [connect]);
 
-  return { submitReport, saveReport, updateReport, clearStorage, removeReport };
+  return {
+    submitReport,
+    saveReport,
+    updateReport,
+    clearAllStorage,
+    removeReport,
+  };
 };
 
 export default useSyncReports;

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
-const useProtectedRoute = async () => {
+export const useProtectedRoute = async () => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -21,5 +21,3 @@ const useProtectedRoute = async () => {
     }
   }, []);
 };
-
-export default useProtectedRoute;

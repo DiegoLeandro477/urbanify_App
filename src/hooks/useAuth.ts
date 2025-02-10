@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { router, useRouter } from "expo-router";
+import { router } from "expo-router";
 import axios from "axios";
-import { jwtDecode, JwtDecodeOptions, JwtPayload } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { tokenDecoded } from "./useSyncReports";
 
 export default function useAuth() {

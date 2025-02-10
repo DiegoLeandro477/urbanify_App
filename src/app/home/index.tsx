@@ -21,7 +21,7 @@ import { useReports } from "@//hooks/useReports";
 import styles from "./styles";
 import useCapture from "@//hooks/useCapture";
 import { router, UnknownInputParams } from "expo-router";
-import useProtectedRoute from "../middlewares/middleware";
+import { useProtectedRoute } from "../middlewares/middleware";
 
 const Home = () => {
   useProtectedRoute(); // Proteção de rotas
