@@ -23,8 +23,7 @@ import RenderReport from "@//components/homeComponents/renderList";
 
 const Home = () => {
   useProtectedRoute(); // Proteção de rotas
-  const { createReport, sendPendingReports, clearAllStorage } =
-    useSyncReports();
+  const { createReport, clearAllStorage } = useSyncReports();
   const { photo, handleCapture, setPhoto } = useCapture(); // Controle da Câmera
   const { reports, loadReports } = useReports(); // Pega a lista de reports monitorada
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
@@ -33,10 +32,6 @@ const Home = () => {
   const [selectedVisibleModal, setSelectedVisibleModal] =
     useState<boolean>(false);
   loadReports();
-
-  useEffect(() => {
-    sendPendingReports();
-  }, []);
   // UseEffect para carregar os reports ao iniciar o app
   useEffect(() => {
     if (photo) {
@@ -75,7 +70,6 @@ const Home = () => {
       return;
     }
   };
-
   return (
     <ScrollView>
       <ModalSelectedInfo

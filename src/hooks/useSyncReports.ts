@@ -6,8 +6,6 @@ import { Report } from "../components/homeComponents/ReportInterface";
 import axios from "axios";
 import eventBus from "@//utils/eventBus";
 import useAuth from "./useAuth";
-import { useReports } from "./useReports";
-import useCapture from "./useCapture";
 import * as Location from "expo-location";
 
 export interface tokenDecoded {
@@ -19,13 +17,12 @@ export interface tokenDecoded {
 
 const useSyncReports = () => {
   const { setDec } = useAuth();
-  const { reports } = useReports();
-  const [report, setReport] = useState<Report | null>(null);
   const clearAllStorage = async () => {
     try {
       await AsyncStorage.clear();
       await SecureStore.deleteItemAsync("authToken");
       console.log("Todos os dados do AsyncStorage foram apagados.");
+      eventBus.emit("updateSecureStore");
     } catch (error) {
       console.error("Erro ao limpar AsyncStorage:", error);
     }
@@ -57,6 +54,7 @@ const useSyncReports = () => {
         process.env.EXPO_PUBLIC_STORAGE_REPORTS,
         JSON.stringify(reports)
       );
+      eventBus.emit("updateStorageReports");
     } catch (error) {
       console.log("[SET-REPORTS] : ", error);
     }
@@ -116,7 +114,7 @@ const useSyncReports = () => {
       attempts++;
     }
     await updateReport(newReport);
-    submitReport(newReport);
+    submit(newReport);
   };
 
   const removeReport = async (report: Report) => {
@@ -128,7 +126,6 @@ const useSyncReports = () => {
       if (updateReport.length !== reports.length) {
         console.log("Report removido [OFF_REPORTS]");
         await setReports(reports);
-        eventBus.emit("updateStorageReports");
       } else {
         console.log("Report nao encontrado [OFF_REPORTS]");
       }
@@ -148,8 +145,7 @@ const useSyncReports = () => {
       );
 
       await setReports(updateReports);
-      console.info("Report atualizado [STORAGE]");
-      eventBus.emit("updateStorageReports");
+      console.info("[STORAGE] Report atualizado!");
     } catch (error) {
       console.error("Erro ao atualizar o report STORAGE", error);
     }
@@ -164,14 +160,13 @@ const useSyncReports = () => {
 
       await setReports(reports);
       console.log("Report salvo [STORAGE].");
-      eventBus.emit("updateStorageReports");
     } catch (error) {
       console.error("Erro ao salvar report [STORAGE]:", error);
     }
   };
   const submit = async (report: Report) => {
     try {
-      console.log("Tentando enviar report..");
+      console.log("Enviando Report");
       const formData = new FormData();
       const token = await SecureStore.getItemAsync("authToken");
       if (!token) return;
@@ -189,13 +184,6 @@ const useSyncReports = () => {
         street: report.street,
         severity: report.severity,
       };
-
-      console.info(
-        "token: ",
-        token,
-        "\nreport: \n",
-        JSON.stringify(data, null, 2)
-      );
 
       // Adiciona os outros dados do relatório
 
@@ -216,7 +204,7 @@ const useSyncReports = () => {
       } else {
         throw new Error("No valid image provided.");
       }
-      console.log("formData:", formData);
+
       // Envia os dados para o Xano
       const response = await axios.post(
         `${process.env.EXPO_PUBLIC_API_URL}/report`,
@@ -229,17 +217,9 @@ const useSyncReports = () => {
           },
         }
       );
-      console.log(JSON.stringify(response.data, null, 2));
-      console.log("Report salvo [DATABASE]");
-      // report.id = response.data.id;
-
-      // const reports = await getReports();
-
-      // const updateReports = reports.map((r: Report) =>
-      //   r.id === report.id ? { ...r, ...report } : r
-      // );
-
-      // await setReports(updateReports);
+      console.log("[DATABASE] Report salvo ");
+      report.submit = true;
+      await updateReport(report);
       return true;
     } catch (error: any) {
       {
@@ -251,33 +231,23 @@ const useSyncReports = () => {
       return false;
     }
   };
-  const submitReport = async (report: Report) => {
-    if ((await NetInfo.fetch()).isConnected) {
-      // tentar enviar pro banco.
-      if (await submit(report)) {
-        report.submit = true;
-        updateReport(report);
+  const sendReports = async () => {
+    try {
+      const reports = await getReports();
+      if (!reports) return;
+      const reportsOffline = reports.filter(
+        (rep: Report) => rep.submit === false
+      );
+      if (reportsOffline.length > 0)
+        console.log(`Reports OFF>>[${reportsOffline.length}]`);
+      for (const report of reports) {
+        if (!report.submit) await submit(report);
       }
+    } catch (error) {
+      console.error("[sendPeding]Erro na requisição POST:", error);
     }
   };
-  const sendPendingReports = async () => {
-    const netInfo = await NetInfo.fetch();
 
-    if (netInfo.isConnected) {
-      try {
-        for (const report of reports) {
-          if (!report.submit) {
-            await submitReport(report);
-          }
-        }
-      } catch (error) {
-        console.error("[sendPeding]Erro na requisição POST:", error);
-      }
-    } else {
-      console.error("Sem conexão com a internet. Tente novamente mais tarde.");
-      // Aqui você pode salvar o report localmente para enviar depois
-    }
-  };
   const [connect, setConnect] = useState<boolean>(false);
   useEffect(() => {
     const handleConnectionChange = async (state: NetInfoState) => {
@@ -291,19 +261,13 @@ const useSyncReports = () => {
 
   useEffect(() => {
     if (connect) {
-      console.info("está Conectado a internet!");
-      sendPendingReports();
+      console.info("está conectado a internet!");
+      sendReports();
     }
   }, [connect]);
 
   return {
-    submitReport,
-    saveReport,
-    updateReport,
     clearAllStorage,
-    removeReport,
-    setReport,
-    sendPendingReports,
     createReport,
   };
 };

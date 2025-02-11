@@ -16,9 +16,7 @@ export default function useAuth() {
 
   const setDec = (token: string) => {
     try {
-      const decoded = jwtDecode(token);
-      console.log("Decoded token: ", decoded);
-      return decoded as tokenDecoded;
+      return jwtDecode(token) as tokenDecoded;
     } catch (error) {
       console.error("Erro ao decoidficar o token: ", error);
       return null;

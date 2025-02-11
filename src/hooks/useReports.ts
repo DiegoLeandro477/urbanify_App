@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Report } from "../components/homeComponents/ReportInterface";
 import eventBus from "@//utils/eventBus";
+import useProtectedRoute from "@//app/middlewares/middleware";
 
 export const useReports = () => {
   const [reports, setReports] = useState<Report[]>([]);
@@ -26,8 +27,14 @@ export const useReports = () => {
   // Monitorar mudanças no AsyncStorage
   useEffect(() => {
     const listener = eventBus.addListener("updateStorageReports", loadReports);
+    const listenerToken = eventBus.addListener("updateSecureStore", () =>
+      useProtectedRoute()
+    );
 
-    return () => listener.remove(); // Remove o listener ao desmontar
+    return () => {
+      listenerToken.remove();
+      listener.remove();
+    }; // Remove o listener ao desmontar
   }, []);
 
   return { reports, loadReports };

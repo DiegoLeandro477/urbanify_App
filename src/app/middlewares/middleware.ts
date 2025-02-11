@@ -9,6 +9,7 @@ const useProtectedRoute = async () => {
 
   const token = await SecureStore.getItemAsync("authToken");
   useEffect(() => {
+    if (token) console.log(`token: ${token}`);
     console.log(
       "[MIDDLEWARE] notToken: ",
       !token,

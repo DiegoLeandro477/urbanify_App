@@ -5,6 +5,7 @@ import {
   Image,
   Text,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { UnknownInputParams } from "expo-router";
@@ -21,8 +22,8 @@ const RenderReport: React.FC<RenderReportProps> = ({ item }) => {
   const router = useRouter();
 
   return (
-    <TouchableOpacity
-      onLongPress={() =>
+    <Pressable
+      onPress={() =>
         router.push({
           pathname: "/reportDetails",
           params: item as unknown as UnknownInputParams,
@@ -80,7 +81,7 @@ const RenderReport: React.FC<RenderReportProps> = ({ item }) => {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
