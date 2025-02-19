@@ -18,22 +18,12 @@ export default function Layout() {
     <>
       <StatusBar
         hidden={false}
-        barStyle="dark-content"
-        backgroundColor="#ffffff"
+        barStyle="default"
+        backgroundColor={"rgba(0,0,0,1)"}
       />
-      <Stack screenOptions={{}}>
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="auth"
-          options={{
-            headerShown: false,
-          }}
-        />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="auth" />
         <Stack.Screen
           name="home/index"
           options={{
@@ -42,10 +32,10 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
-          name="reportDetails/index"
+          name="home/reportDetails/index"
           options={{
             headerShown: true,
-            header: () => <Header />,
+            title: "Detalhes",
           }}
         />
       </Stack>

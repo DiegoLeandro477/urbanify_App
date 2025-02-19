@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { tokenDecoded } from "./useSyncReports";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function useAuth() {
   const [email, setEmail] = useState<string>("admin@admin.com");
@@ -13,15 +13,6 @@ export default function useAuth() {
     useState<boolean>(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  const setDec = (token: string) => {
-    try {
-      return jwtDecode(token) as tokenDecoded;
-    } catch (error) {
-      console.error("Erro ao decoidficar o token: ", error);
-      return null;
-    }
-  };
 
   const signIn = async () => {
     if (!email || !password) {
@@ -40,7 +31,6 @@ export default function useAuth() {
         }
       );
       const { token } = response.data;
-      setDec(token);
       // 🔹 Salva o token no SecureStore
       await SecureStore.setItemAsync("authToken", token);
       setIsAuthenticated(true); // Marca como autenticado após o login
@@ -59,6 +49,7 @@ export default function useAuth() {
 
   const singOut = async () => {
     await SecureStore.deleteItemAsync("authToken");
+    await AsyncStorage.clear();
     console.log("Usuário deslogado!");
     router.push("/auth/login");
   };
@@ -83,7 +74,6 @@ export default function useAuth() {
     loading,
     signIn,
     singOut,
-    setDec,
     errorEmailOrPassword,
     isAuthenticated,
   };

@@ -7,8 +7,8 @@ interface ButtonCustomProps {
   gradientColors?: [string, string, ...string[]];
   onPress: () => void;
   title: {
-    value: string;
-    color: string;
+    value?: string;
+    color?: string;
   };
   styleCustom?: ViewStyle[] | ViewStyle;
 }
@@ -16,7 +16,7 @@ interface ButtonCustomProps {
 const ButtonCustom: React.FC<ButtonCustomProps> = ({
   gradientColors = [colors.p1, colors.p5],
   onPress,
-  title,
+  title = { color: colors.c12 },
   styleCustom = {},
 }) => {
   return (

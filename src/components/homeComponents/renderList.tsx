@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  TouchableOpacity,
-  View,
-  Image,
-  Text,
-  ActivityIndicator,
-  Pressable,
-} from "react-native";
+import { View, Image, Text, ActivityIndicator, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { UnknownInputParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,8 +18,8 @@ const RenderReport: React.FC<RenderReportProps> = ({ item }) => {
     <Pressable
       onPress={() =>
         router.push({
-          pathname: "/reportDetails",
-          params: item as unknown as UnknownInputParams,
+          pathname: "/home/reportDetails",
+          params: { id: item.id } as unknown as UnknownInputParams,
         })
       }
       style={styles.reportCard}

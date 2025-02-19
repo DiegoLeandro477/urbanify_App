@@ -14,18 +14,18 @@ import {
 } from "react-native";
 import { Report } from "@//components/homeComponents/ReportInterface";
 import ConfirmDeleteModal from "@//components/homeComponents/confirmeDeleteModal";
-import useSyncReports from "@//hooks/useSyncReports";
 import { useReports } from "@//hooks/useReports";
 import styles from "./styles";
 import useCapture from "@//hooks/useCapture";
 import useProtectedRoute from "../middlewares/middleware";
 import RenderReport from "@//components/homeComponents/renderList";
+import useSyncReportsOffline from "@//hooks/useSyncReportsOffline";
 
 const Home = () => {
   useProtectedRoute(); // Proteção de rotas
-  const { createReport, clearAllStorage } = useSyncReports();
   const { photo, handleCapture, setPhoto } = useCapture(); // Controle da Câmera
-  const { reports, loadReports } = useReports(); // Pega a lista de reports monitorada
+  const { reports, loadReports, createReport } = useReports(); // Pega a lista de reports monitorada
+  const { clearAllStorage } = useSyncReportsOffline();
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
     useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Report | null>(null);
