@@ -28,10 +28,6 @@ export const useReports = () => {
       id: Math.round(
         Date.now() / Math.floor(Math.random() * (1000 + 1))
       ).toString(), // Gera um novo ID
-      coodenates: null, // Placeholder para localização
-      subregion: null,
-      street: null,
-      district: null,
       severity: severity.toUpperCase(),
       submit: false,
       image: photo!,

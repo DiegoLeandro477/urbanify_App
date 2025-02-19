@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
     height: 80,
     paddingHorizontal: 10,
-    backgroundColor: colors.p2,
+    backgroundColor: colors.p1,
     elevation: 1,
   },
   buttonSingOut: {

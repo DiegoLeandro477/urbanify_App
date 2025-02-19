@@ -101,15 +101,16 @@ const ModalSelectedInfo: React.FC<ModalSelectedInfoProps> = ({
 
           <ButtonCustom
             styleCustom={[styles.buttonModal]}
-            title={{ value: "ENVIAR", color: "#fff" }}
+            title={"ENVIAR"}
             onPress={handleConfirm}
           />
           <ButtonCustom
-            title={{ value: "CANCELAR", color: colors.c0 }}
+            title={"CANCELAR"}
             styleCustom={[
               styles.buttonModal,
               { marginTop: 10, width: "100%", justifyContent: "center" },
             ]}
+            textCustom={{ color: colors.c0 }}
             gradientColors={["#fff", "#fff"]}
             onPress={handleCancel}
           />

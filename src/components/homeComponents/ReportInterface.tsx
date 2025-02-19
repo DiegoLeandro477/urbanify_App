@@ -2,10 +2,12 @@ export interface Report {
   id: string;
   image: string;
   severity: string;
-  coodenates: { latitude: string; longitude: string } | null;
-  subregion: string | null;
-  district: string | null;
-  street: string | null;
+  coodenates?: { latitude: string; longitude: string };
+  subregion?: string;
+  address?: string;
+  geohash?: string;
+  district?: string;
+  street?: string;
   date: string;
   submit: boolean;
 }

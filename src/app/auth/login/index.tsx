@@ -119,12 +119,12 @@ const Login = () => {
         <ButtonCustom
           styleCustom={{ marginTop: 50, marginBottom: 10 }}
           onPress={() => signIn()}
-          title={{ value: "ENTRAR", color: "white" }}
+          title={"ENTRAR"}
         />
 
         <ButtonCustom
           onPress={() => handleCancel()} // precisa fechar o app
-          title={{ value: "CADASTRAR", color: "white" }}
+          title={"CADASTRAR"}
         />
       </View>
     </View>

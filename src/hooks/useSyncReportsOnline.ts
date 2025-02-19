@@ -5,6 +5,40 @@ import useSyncReportsOffline from "./useSyncReportsOffline";
 
 const useSyncReportsOnline = () => {
   const { removeReportOffline, saveReportOffilne } = useSyncReportsOffline();
+
+  const getReportOnline = async (report: Report) => {
+    try {
+      console.log(`Obtendo dados do Report: id->[${report.id}]`);
+
+      const token = await SecureStore.getItemAsync("authToken");
+      if (!token) return;
+
+      const data = {
+        address: report.address,
+        geohash: report.geohash,
+      };
+      console.log("Enviando: ", JSON.stringify(data, null, 2));
+      // Envia os dados para o Xano
+      const response = await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URL}/report/status`,
+        data,
+        {
+          headers: {
+            Accept: "application/json", // Aceitar resposta em JSON
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", // Tipo de conteúdo para envio de arquivo
+          },
+        }
+      );
+
+      console.log(JSON.stringify(response.data, null, 2));
+    } catch (error) {
+      console.error("[DATABASE] error: ", error);
+    } finally {
+      return report;
+    }
+  };
+
   const saveReportOnline = async (report: Report) => {
     try {
       console.log("Enviando Report");
@@ -59,7 +93,10 @@ const useSyncReportsOnline = () => {
       await removeReportOffline(report.id);
       newReport.submit = true;
       newReport.id = response.data.report.id;
+      newReport.address = response.data.report.address;
+      newReport.geohash = response.data.report.geohash;
       await saveReportOffilne(newReport);
+      console.log(response.data);
       return true;
     } catch (error: any) {
       {
@@ -74,6 +111,7 @@ const useSyncReportsOnline = () => {
 
   return {
     saveReportOnline,
+    getReportOnline,
   };
 };
 

@@ -95,10 +95,7 @@ const Home = () => {
             <Text style={styles.photoText}>Fotografe aqui</Text>
           </TouchableOpacity>
           {/* Botão de envio */}
-          <ButtonCustom
-            title={{ value: "ENVIAR", color: "#fff" }}
-            onPress={handleCapture}
-          />
+          <ButtonCustom title={"ENVIAR"} onPress={handleCapture} />
         </View>
         <View>
           {/* Lista de reports recentes */}
