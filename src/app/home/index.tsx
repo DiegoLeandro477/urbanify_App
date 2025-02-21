@@ -55,7 +55,7 @@ const Home = () => {
       })();
     }
   }, [photo]);
-  const handleSeverity = async (severity: string | null) => {
+  const handleSeverity = async (severity: number | null) => {
     if (!severity || !photo) return;
 
     createReport(severity, photo);

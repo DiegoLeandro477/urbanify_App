@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Font, colors, ClassColor } from "../../styles/global";
 import ButtonCustom from "../buttonCustom";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SeverityEnum } from "@//constants/SeverityEnum";
 
 interface ModalSelectedInfoProps {
   visible: boolean;
-  onCreateReport: (severity: string | null) => void;
+  onCreateReport: (sev: number | null) => void;
   onRequestClose: () => void;
 }
 
@@ -15,27 +16,26 @@ const ModalSelectedInfo: React.FC<ModalSelectedInfoProps> = ({
   onCreateReport,
   onRequestClose,
 }) => {
-  const [selectedSeverity, setSelectedSeverity] = React.useState<string | null>(
-    null
-  );
 
-  const selectSeverity = (severity: string) => {
-    setSelectedSeverity(severity); // Altera o estado para a gravidade selecionada
-  };
+  const [severity, setSeveirty] = useState<number | null>(null);
+
+  const selectSeverity = (sev: number) => {
+    setSeveirty(sev);
+  }
 
   const handleConfirm = () => {
-    console.log("SelectSeverity: ", selectedSeverity);
-    if (!selectedSeverity) {
+    console.log("SelectSeverity: ", severity);
+    if (!severity) {
       alert("Selecione uma opção!");
       return;
     }
-    onCreateReport(selectedSeverity);
-    setSelectedSeverity(null);
+    onCreateReport(severity);
+    setSeveirty(null);
     onRequestClose();
   };
 
   const handleCancel = () => {
-    setSelectedSeverity(null);
+    setSeveirty(null);
     onRequestClose();
   };
 
@@ -61,9 +61,9 @@ const ModalSelectedInfo: React.FC<ModalSelectedInfoProps> = ({
                 { borderColor: colors.red },
                 styles.buttonModal,
                 { width: "47.5%" },
-                selectedSeverity === "grave" && styles.buttonSelectedGrave,
+                severity === SeverityEnum.GRAVE && styles.buttonSelectedGrave,
               ]}
-              onPress={() => selectSeverity("grave")}
+              onPress={() => selectSeverity(SeverityEnum.GRAVE)}
             >
               <MaterialCommunityIcons
                 style={[
@@ -80,11 +80,11 @@ const ModalSelectedInfo: React.FC<ModalSelectedInfoProps> = ({
               style={[
                 styles.buttonModal,
                 { width: "47.5%" },
-                selectedSeverity === "moderado" &&
+                severity === SeverityEnum.MODERADO &&
                   styles.buttonSelectedModerado,
                 { borderColor: colors.yellow },
               ]}
-              onPress={() => selectSeverity("moderado")}
+              onPress={() => selectSeverity(SeverityEnum.MODERADO)}
             >
               <MaterialCommunityIcons
                 style={[

@@ -2,6 +2,7 @@ import * as SecureStore from "expo-secure-store";
 import { Report } from "../components/homeComponents/ReportInterface";
 import axios from "axios";
 import useSyncReportsOffline from "./useSyncReportsOffline";
+import { getSeverityLabel } from "../constants/SeverityEnum";
 
 const useSyncReportsOnline = () => {
   const { removeReportOffline, saveReportOffilne } = useSyncReportsOffline();
@@ -13,15 +14,12 @@ const useSyncReportsOnline = () => {
       const token = await SecureStore.getItemAsync("authToken");
       if (!token) return;
 
-      const data = {
-        address: report.address,
-        geohash: report.geohash,
-      };
-      console.log("Enviando: ", JSON.stringify(data, null, 2));
+      const url = `${process.env.EXPO_PUBLIC_API_URL}/report/status/address/${report.address}/geohash/${report.geohash}`;
+    
+      console.log("Enviando requisição para:", url);
+  
       // Envia os dados para o Xano
-      const response = await axios.post(
-        `${process.env.EXPO_PUBLIC_API_URL}/report/status`,
-        data,
+      const response = await axios.get(url,
         {
           headers: {
             Accept: "application/json", // Aceitar resposta em JSON
@@ -54,7 +52,7 @@ const useSyncReportsOnline = () => {
         subregion: report.subregion,
         district: report.district,
         street: report.street,
-        severity: report.severity,
+        severity: getSeverityLabel(report.severity),
       };
 
       // Adiciona os outros dados do relatório

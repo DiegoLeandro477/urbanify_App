@@ -16,7 +16,7 @@ export const useReports = () => {
 
   const [connect, setConnect] = useState<boolean>(false);
 
-  const createReport = async (severity: string, photo: string) => {
+  const createReport = async (severity: number, photo: string) => {
     const now = new Date();
     const formattedDate = now.toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -28,7 +28,7 @@ export const useReports = () => {
       id: Math.round(
         Date.now() / Math.floor(Math.random() * (1000 + 1))
       ).toString(), // Gera um novo ID
-      severity: severity.toUpperCase(),
+      severity: severity,
       submit: false,
       image: photo!,
       date: formattedDate,
