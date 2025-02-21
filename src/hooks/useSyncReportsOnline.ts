@@ -2,12 +2,14 @@ import * as SecureStore from "expo-secure-store";
 import { Report } from "../components/homeComponents/ReportInterface";
 import axios from "axios";
 import useSyncReportsOffline from "./useSyncReportsOffline";
-import { getSeverityLabel } from "../constants/SeverityEnum";
+import { SeverityEnum } from "@//constants/SeverityEnum";
+import { StatusEnum } from "@//constants/statusEnum";
 
 const useSyncReportsOnline = () => {
   const { removeReportOffline, saveReportOffilne } = useSyncReportsOffline();
 
   const getReportOnline = async (report: Report) => {
+    let status = null;
     try {
       console.log(`Obtendo dados do Report: id->[${report.id}]`);
 
@@ -29,11 +31,12 @@ const useSyncReportsOnline = () => {
         }
       );
 
-      console.log(JSON.stringify(response.data, null, 2));
+      console.log(StatusEnum[response.data.status]);
+      status = response.data.status
     } catch (error) {
       console.error("[DATABASE] error: ", error);
     } finally {
-      return report;
+      return status;
     }
   };
 
@@ -52,7 +55,7 @@ const useSyncReportsOnline = () => {
         subregion: report.subregion,
         district: report.district,
         street: report.street,
-        severity: getSeverityLabel(report.severity),
+        severity: SeverityEnum[report.severity],
       };
 
       // Adiciona os outros dados do relatório
@@ -105,7 +108,7 @@ const useSyncReportsOnline = () => {
         );
       }
     }
-  };
+  };  
 
   return {
     saveReportOnline,

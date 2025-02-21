@@ -11,21 +11,24 @@ import { Ionicons } from "@expo/vector-icons";
 import ButtonCustom from "@//components/buttonCustom";
 import { useReports } from "@//hooks/useReports";
 import useSyncReportsOnline from "@//hooks/useSyncReportsOnline";
+import { StatusEnum, StatusEnumType } from "@//constants/statusEnum";
 const ReportDetails = () => {
   useProtectedRoute();
   const params = useLocalSearchParams();
   const { getReport } = useSyncReports();
   const [item, setItem] = useState<Report | null>(null);
+  const [status, setStatus] = useState<StatusEnumType | null>(null);
   const { getReportOnline } = useSyncReportsOnline();
   useEffect(() => {
     (async () => {
       if (params.id) {
         const report = await getReport(params.id as string);
         if (report) {
-          setItem(null);
-          setItem((await getReportOnline(report)) || null);
+          setItem(report
+          );
+          setStatus((await getReportOnline(report)) || null);
         }
-      }
+      } 
     })();
   }, [params.id]);
 
@@ -64,24 +67,24 @@ const ReportDetails = () => {
           <View
             style={[
               styles.BeforeElement,
-              { backgroundColor: true && colors.p1 },
+              { backgroundColor: (status === StatusEnum.AVALIADO) ? colors.p1 : colors.c2 },
             ]}
           />
 
           <View
-            style={[styles.sub_container, true && styles.check_sub_container]}
+            style={[styles.sub_container, (status === StatusEnum.AVALIADO) && styles.check_sub_container]}
           >
             <Ionicons
               name="checkmark-sharp"
               size={24}
-              style={[styles.icon, true && styles.check_icon]}
+              style={[styles.icon, (status === StatusEnum.AVALIADO) && styles.check_icon]}
             />
             <Ionicons
               name="checkmark-sharp"
               size={24}
               style={[
                 styles.icon,
-                true && styles.check_icon,
+                (status === StatusEnum.AVALIADO) && styles.check_icon,
                 {
                   left: 10,
                   top: 11,
@@ -91,7 +94,7 @@ const ReportDetails = () => {
               ]}
             />
             <View style={styles.sub_container_info}>
-              <Text style={[Font.l, true ? ClassColor.p1 : ClassColor.c2]}>
+              <Text style={[Font.l, (status === StatusEnum.AVALIADO) ? ClassColor.p1 : ClassColor.c2]}>
                 Avaliado
               </Text>
               <View style={styles.sub_container_info_02}>
@@ -99,6 +102,46 @@ const ReportDetails = () => {
               </View>
             </View>
           </View>
+          
+          <View
+            style={[
+              styles.BeforeElement,
+              { backgroundColor: (status === StatusEnum.REPORTADO) ? colors.p1 : colors.c2 },
+            ]}
+          />
+
+          <View
+            style={[styles.sub_container, status === StatusEnum.REPORTADO && styles.check_sub_container]}
+          >
+            <Ionicons
+              name="checkmark-sharp"
+              size={24}
+              style={[styles.icon, (status === StatusEnum.REPORTADO) && styles.check_icon]}
+            />
+            <Ionicons
+              name="checkmark-sharp"
+              size={24}
+              style={[
+                styles.icon,
+                (status === StatusEnum.REPORTADO) && styles.check_icon,
+                {
+                  left: 10,
+                  top: 11,
+                  position: "absolute",
+                  backgroundColor: "transparent",
+                },
+              ]}
+            />
+            <View style={styles.sub_container_info}>
+              <Text style={[Font.l, (status === StatusEnum.REPORTADO) ? ClassColor.p1 : ClassColor.c2]}>
+                Avaliado
+              </Text>
+              <View style={styles.sub_container_info_02}>
+                <Text style={[Font.s]}>{item.date}</Text>
+              </View>
+            </View>
+          </View>
+
         </View>
       </View>
     </>

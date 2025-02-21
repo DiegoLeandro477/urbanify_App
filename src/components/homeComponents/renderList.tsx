@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "@//app/home/styles";
 import { Report } from "./ReportInterface";
 import { ClassColor, colors, Font } from "@//styles/global";
-import { getSeverityLabel, SeverityEnum } from "@//constants/SeverityEnum";
+import { SeverityEnum } from "@//constants/SeverityEnum";
 
 interface RenderReportProps {
   item: Report;
@@ -68,7 +68,7 @@ const RenderReport: React.FC<RenderReportProps> = ({ item }) => {
                 : styles.severityGrave,
             ]}
           >
-            {getSeverityLabel(item.severity)}
+            {SeverityEnum[item.severity]}
           </Text>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={[Font.xs, ClassColor.c5]}>{item.date}</Text>

@@ -20,6 +20,7 @@ import useCapture from "@//hooks/useCapture";
 import useProtectedRoute from "../middlewares/middleware";
 import RenderReport from "@//components/homeComponents/renderList";
 import useSyncReportsOffline from "@//hooks/useSyncReportsOffline";
+import Toast from "react-native-toast-message";
 
 const Home = () => {
   useProtectedRoute(); // Proteção de rotas
@@ -113,6 +114,7 @@ const Home = () => {
           />
         </View>
       </View>
+      <Toast/>
     </ScrollView>
   );
 };

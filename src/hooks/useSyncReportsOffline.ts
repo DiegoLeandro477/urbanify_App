@@ -15,6 +15,18 @@ const useSyncReportsOffline = () => {
     }
   };
 
+  const findReportStreeAndDistrict = async (rep: Report) => {
+    const reports = await getReports();
+    if (!reports) return false;
+
+    const report = reports.filter((r: Report) => r.street === rep.street && r.district === rep.district && r.subregion === rep.subregion)[0] || null
+
+    if (report)
+      return true;
+
+    return false;
+  }
+
   const getReports = async () => {
     let storedReports = null;
     try {
@@ -109,6 +121,7 @@ const useSyncReportsOffline = () => {
     getReport,
     updateReportOffline,
     removeReportOffline,
+    findReportStreeAndDistrict
   };
 };
 
